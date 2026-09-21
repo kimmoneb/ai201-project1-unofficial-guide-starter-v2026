@@ -20,6 +20,7 @@
 # Unit 1
 
 ## What This Does
+This project creates a question-answering system using the campus_life corpus. The system retrieves information from documents about campus life, including dining, housing, courses, transportation, and other student-related topics. It uses the retrieved information to answer questions and identify the source where the information came from. The system also uses a relevance cutoff to avoid answering questions that are not covered by the corpus.
 
 <!-- Three or four sentences. Which corpus you picked, and the kinds of
      questions your system answers. Write it for someone who has never seen
@@ -88,14 +89,14 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** How frequently does the campus shuttle run?
 
-**Answer:**
+**Answer:** I don't have enough information to answer how frequently the campus shuttle runs (transit_shuttle.txt).
+The system retrieved 'transit_shuttle.txt' with a best distance of 0.299, which was below my 0.6 cutoff and indicated a close match. However, the model still said it did not have enough information to answer. This shows retrieval finds a relevant source, the generated response may still fail to use the information from that source.
 
-```
-```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.6
+I kept the cutoff at 0.6 because results beloe this value are treated as relevant. My test questions were outside the scope of the campus_life corpus, while the provided out-of-scope questions had best distances between 0.78 and 0.86. A 0.6 cutoff prevents these unrelated questions from passing.
 
 <!-- The number you set in config.py, and how you got there.
 
@@ -108,7 +109,18 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| What two Caribbean islands got independence from Great Britain in August 1962? | No | 0.826 |
+| What city opened the first American Subway System? | No | 0.660 |
+| Which team won FIFA World Cup in 2026? | No | 0.788 |
+| Who is the fastest woman in history? | No | 0.709 |
+| What is the name of the island with 365 beaches? | No | 0.702 |
+
+The best distances for my five test questions ranged from 0.660 to 0.826.
+The five provided out-of-scope questions ranged from 0.780 to 0.850.
+There was some overlap because my test questions were also not covered by the
+campus_life corpus. I kept the relevance cutoff at 0.6 because the retrieved
+chunks did not contain the answers to my questions, and increasing the cutoff
+could allow unrelated information to pass the relevance gate.
 
 ## How I Used AI
 
@@ -121,9 +133,9 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 
      Milestone 5. -->
 
-**1.**
+**1.** I used AI when I ran into an ONNX embedding error that prevented me from building the search index. It helped me narrow the problem down to store.py and understand what needed to be changed. I tested the suggested fix before keeping it to make sure the indexing and retrieval actually worked.
 
-**2.**
+**2.** I used AI to better understand the distance scores I got while testing my questions. It helped me understand why my questions were returning high distances and how those results compared with the out-of-scope questions. Instead of changing my questions to get better results, I kept them and documented that the campus_life corpus did not contain the information needed to answer them.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
