@@ -164,11 +164,11 @@ could allow unrelated information to pass the relevance gate.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 0/5 | 0/5 | 0/5 | MISSED |
+| 2. Every answer names a source | 5 of 5 | 0/5 | 0/5 | 0/5 | MISSED |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Sampled chunks contain a complete thought | 4 of 5 | 3/5 | 3/5 | 3/5 | MISSED |
+| 5. Answers are factually accurate | 4 of 5 | 0/5 | 0/5 | 0/5 | MISSED |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
@@ -187,11 +187,11 @@ could allow unrelated information to pass the relevance gate.
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunk contains the answer | MISSED | All three runs scored 0/5, below the target of 4/5. |
+| 2 | Every answer names a source | MISSED | All three runs scored 0/5 because the gate prevented answers from being generated. |
+| 3 | Gate stops out-of-corpus questions | MET | All three runs scored 5/5, exceeding the 4/5 target. |
+| 4 | Sampled chunks contain a complete thought | MISSED | Only 3/5 sampled chunks were complete enough to stand on their own. |
+| 5 | Answers are factually accurate | MISSED | All three runs scored 0/5 because no answers were generated to evaluate. |
 
 ## Diagnoses
 
@@ -212,12 +212,31 @@ could allow unrelated information to pass the relevance gate.
      low, and which one you'd tighten and to what.
 
      Milestone 3. -->
+     **Criterion 1 — MISSED**
+- Stage: Retrieval / relevance gate
+- Mechanism: The five in-scope questions had best retrieval distances of approximately 0.66–0.83, but the relevance threshold was 0.60. The gate therefore rejected relevant questions before they could continue.
+
+**Criterion 2 — MISSED**
+- Stage: Generation
+- Mechanism: Because the relevance gate stopped the in-scope questions, generation never produced answers, so the answers could not contain source names.
+
+**Criterion 4 — MISSED**
+- Stage: Chunking
+- Mechanism: Some chunks were too short or incomplete to stand alone. For example, a sampled chunk contained only "On the add/drop deadline," which requires additional context.
+
+**Criterion 5 — MISSED**
+- Stage: Generation
+- Mechanism: The relevance gate prevented the in-scope questions from reaching generation, so there were no generated answers to evaluate for factual accuracy.
+
+**Pattern:** The main pattern across Criteria 1, 2, and 5 was the relevance gate blocking in-scope questions. Criterion 4 revealed a separate chunking problem.
 
 ## The Improvement
 
 **What I changed:**
+I increased the relevance gate threshold from 0.60 to 0.85.
 
 **Why I picked it:**
+The five in-scope questions had best retrieval distances of approximately 0.66–0.83, so the original 0.60 threshold was rejecting relevant questions. Increasing the threshold directly addresses the relevance-gate problem identified in my diagnosis.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -235,14 +254,17 @@ could allow unrelated information to pass the relevance gate.
 | 4. | | | | | |
 | 5. | | | | | |
 
-**Did it help?**
+**After-run status:** The full after-improvement evaluation could not be completed. With the threshold increased to 0.85, the first in-scope question passed the relevance gate and reached generation, but the Gemini API repeatedly returned a 503 UNAVAILABLE error due to temporary high demand. Because the evaluation did not complete, I did not assign unsupported after-run scores or verdicts.
 
+**Did it help?**
+The change affected the intended stage because an in-scope question that had previously been rejected was able to pass the relevance gate and reach generation. However, I cannot determine whether the system improved across all five criteria because the full after-test was interrupted by the repeated Gemini 503 errors.
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit
      and is more interesting than one that worked. What matters is that you can
      tell.
 
      Milestone 4. -->
+
 
 ## What's Still Broken
 
