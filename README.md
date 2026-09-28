@@ -267,7 +267,11 @@ The change affected the intended stage because an in-scope question that had pre
 
 
 ## What's Still Broken
+The relevance gate still needs additional testing. Although the higher threshold allowed an in-scope question through, I would test multiple threshold values against both in-scope and out-of-scope questions to find a better balance.
 
+The chunking criterion also remains unresolved because the threshold change did not address incomplete chunks. I would next experiment with chunk size, overlap, or paragraph-based chunking and check whether at least 4 of 5 sampled chunks can stand alone.
+
+I stopped after the threshold improvement because the after-evaluation repeatedly failed at the generation stage with a Gemini 503 UNAVAILABLE error. I did not make another system change because I wanted to keep this experiment limited to one improvement.
 <!-- For each criterion still missed after your fix: what you'd do about it,
      and why you stopped where you did.
 
@@ -275,9 +279,10 @@ The change affected the intended stage because an in-scope question that had pre
      not.
 
      Milestone 5. -->
+     
 
 ## What I'd Do Differently
-
+I would rewrite Criterion 1 to measure whether the answer appears within the top retrieved chunks for at least 4 of 5 in-scope questions. This would separate retrieval quality from the relevance gate and make it easier to identify which stage is responsible when a question fails.
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
